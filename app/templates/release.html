@@ -1,0 +1,15 @@
+<div class="stage" id="stage-release" hidden>
+  <section class="panel"><div class="panel-head"><h2>修订概览</h2><span class="dim" id="release-source">同批回执</span></div><div id="release-kpis" class="fact-grid"></div></section>
+  <section class="panel"><div class="panel-head"><h2>逐包裹发运放行</h2>
+    <label>显示 <select id="release-filter">
+      <option value="all">全部包裹</option>
+      <option value="KEEP">沿用</option>
+      <option value="REISSUE">换新面单</option>
+      <option value="HOLD">暂缓</option>
+    </select></label>
+  </div><div class="scroll" id="release-table"></div></section>
+  <section class="panel"><div class="panel-head"><h2>裁决证据（模板 · 坐标 · 遮挡 · 条码 · 作废关系）</h2></div><div id="release-evidence" class="scroll"></div></section>
+  <section class="panel"><div class="panel-head"><h2>作废登记勾稽</h2><label>显示 <select id="release-void-filter">
+    <option value="applied">已应用</option><option value="excluded">隔离/重复登记</option>
+  </select></label></div><div class="scroll" id="release-voids"></div></section>
+</div>

@@ -13,7 +13,8 @@
 | M4 条码字段对读 | 比对运单号、路由码、收件代号 | `GET /api/barcode` | `app/modules/barcode/service.py` | `tests/test_barcode.py` |
 | M5 边界遮挡 | 筛选静区、版位和相交面积 | `GET /api/occlusion` | `app/modules/occlusion/rules.py` `app/modules/occlusion/service.py` | `tests/test_occlusion.py` |
 | M6 出单勾稽 | 清点输入、结果与包裹可发资格 | `GET /api/reconcile` | `app/modules/reconcile/service.py` | `tests/test_reconcile.py` |
-| M7 重打工单 | 作废、重打、复算与回切旧批次 | `GET /api/tickets` `POST /api/tickets/void` `POST /api/tickets/reprint` `GET /api/runs/<run_id>/evidence.json` | `app/modules/tickets/ledger.py` `app/modules/tickets/service.py` `app/store.py` | `tests/test_tickets.py` |
+| M7 发运放行修订 | 逐包裹裁决沿用、换新面单或暂缓，并汇总同批回执证据 | `GET /api/release` | `app/modules/release/service.py` `app/modules/release/handler.py` | `tests/test_release.py` |
+| M8 重打工单 | 作废、重打、复算与回切旧批次 | `GET /api/tickets` `POST /api/tickets/void` `POST /api/tickets/reprint` `GET /api/runs/<run_id>/evidence.json` | `app/modules/tickets/ledger.py` `app/modules/tickets/service.py` `app/store.py` | `tests/test_tickets.py` |
 
 ## 陷阱登记
 
@@ -38,3 +39,4 @@
 - 每条出单输入归入有效、撤销或隔离。空白、坏行、采信重复均计入隔离。
 - 包裹最多有一张有效面单；历史作废仍保留前后继和作废登记。作废登记另外勾稽，不计入出单数。
 - 面单物理检测与工单资格各保留自己的依据，几何有问题的回执不进入可发链。
+- 发运放行修订是只读视图：有效面单裁「沿用」，已作废无后继裁「换新面单」，隔离或无单裁「暂缓」。模板、坐标、遮挡、条码与作废关系均取自同一批次快照，不重算、不覆盖旧版清单。

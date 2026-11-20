@@ -67,3 +67,7 @@ tbody tr:hover td { background: var(--panel-2); }
 .fact { padding: 5px 7px; border: 1px solid var(--line); background: var(--panel-2); }
 .fact span { display: block; }
 .fact strong { font-size: 17px; }
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; font-size: 11px; white-space: nowrap; }
+.badge.ok { color: var(--ok); }
+.badge.warn { color: var(--warn); }
+.badge.bad { color: var(--bad); }

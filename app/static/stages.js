@@ -55,6 +55,48 @@ export function reconcile(data) {
     [row.parcel,row.valid,row.revoked,row.isolated,row.live_labels.join(' / ') || '—']),'没有匹配包裹');
 }
 
+const releaseTone = {KEEP:'ok', REISSUE:'warn', HOLD:'bad'};
+
+function evidenceRows(item) {
+  const rows = [];
+  for (const proof of item.evidence) {
+    const coord = proof.coordinate ? `DPI ${proof.coordinate.dpi} · 旋转 ${proof.coordinate.rotation}° · ${proof.coordinate.origin} · ${proof.coordinate.unit}` : explanation(proof.coordinate_code);
+    const tpl = proof.template ? `${proof.template.format} r${proof.template.revision}（源行 ${proof.template.version_line}）` : '未绑定模板';
+    const scan = proof.barcode ? (proof.barcode.ok ? '对读通过' : proof.barcode.checks.filter(c => c.code).map(c => explanation(c.code)).join(' / ')) : '—';
+    const layout = proof.occlusion ? (proof.occlusion.ok ? '版面通过' : proof.occlusion.issues.map(i => explanation(i.code)).join(' / ')) : '—';
+    const chain = proof.chain ? [states[proof.chain.state], proof.chain.replaces ? `承接 ${proof.chain.replaces}` : '',
+      proof.chain.replaced_by ? `后继 ${proof.chain.replaced_by}` : '', proof.chain.void ? `作废 ${proof.chain.void.id}（${explanation(proof.chain.void.reason)}）` : '']
+      .filter(Boolean).join(' · ') : '—';
+    rows.push([proof.label, tpl, coord, scan, layout, chain]);
+  }
+  return rows;
+}
+
+export function release(data) {
+  summary([['修订包裹',data.totals.parcels,'件'],['沿用',data.counts.KEEP,'件','ok'],
+    ['换新面单',data.counts.REISSUE,'件','warn'],['暂缓',data.counts.HOLD,'件','bad'],['规则版本',`v${data.rule_version}`]]);
+  facts('release-kpis',[['可发包裹',data.totals.shippable,'ok'],['待处理',data.totals.unissued,'warn'],
+    ['已应用作废',data.voids.applied.length],['隔离/重复作废',data.voids.excluded.length,'warn'],
+    ['隔离回执',data.excluded_prints.length,'warn']]);
+  $('release-source').textContent = `批次 ${data.run_id.slice(0,12)} · 同批回执`;
+  const filter = $('release-filter').value;
+  const rows = data.decisions.filter(item => filter === 'all' || item.action === filter);
+  table('release-table',['包裹','裁决','裁决依据','可发面单','涉及面单'], rows.map(item => {
+    const badge = element('span', item.action_label, `badge ${releaseTone[item.action]}`);
+    return [item.parcel, badge, explanation(item.reason), item.live_labels.join(' / ') || '—', item.labels.join(' / ') || '—'];
+  }),'没有匹配包裹');
+  const focused = rows.length === 1 ? rows[0] : rows.find(item => item.action !== 'KEEP') || rows[0];
+  table('release-evidence',['面单','模板','坐标归一','条码对读','边界遮挡','作废/重打链'],
+    focused ? evidenceRows(focused) : [], '请选择包裹查看证据');
+  if ($('release-void-filter').value === 'applied') {
+    table('release-voids',['登记编号','面单','时点','原因','源行'], data.voids.applied.map(row =>
+      [row.id,row.label,clock(row.at),explanation(row.reason),row.line]),'没有已应用作废');
+  } else {
+    table('release-voids',['源行','原因码','判定','登记编号','目标面单'], data.voids.excluded.map(row =>
+      [row.line,row.code,explanation(row.code),row.data.id,row.data.label]),'没有隔离或重复登记');
+  }
+}
+
 export function ticketForm(data, active) {
   const isReprint = $('ticket-action').value === 'reprint';
   const choices = data.labels.filter(row => isReprint ? row.state === 'revoked' && !row.replaced_by : row.state === 'valid');

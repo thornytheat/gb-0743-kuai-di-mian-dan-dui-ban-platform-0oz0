@@ -16,4 +16,7 @@ LABELS = {
     'LABEL_EXISTS': '面单编号已使用', 'STALE_RUN': '批次已更新，请重新加载', 'RUN_NOT_FOUND': '批次不存在',
     'BAD_REQUEST': '请求字段无效', 'UPLOAD_REQUIRED': '请选择出单文件', 'REPLAY_DRIFT': '复算结果与留档不一致',
     'ACCOUNT_MISMATCH': '出单勾稽异常', 'STORE_UNAVAILABLE': '存储暂不可用，请重试',
+    'LIVE_LABEL': '面单有效，沿用发运', 'VOID_AWAITING_REPRINT': '旧单已作废，待换新面单',
+    'ISOLATED_LABEL': '回执隔离，暂缓发运', 'NO_LABEL': '包裹无任何出单记录，暂缓',
+    'MULTIPLE_LIVE': '包裹存在多张有效面单，勾稽异常需暂缓',
 }
